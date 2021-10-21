@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring
 from collections.abc import Iterable
 
 
@@ -5,9 +6,12 @@ class TicTacToe:
     """
     My TicTacToe game-implementing class
     """
+
     def __init__(self):
         self.board = [' ' for _ in range(9)]
         self.turn = 1
+        self.history = []
+        self.steps = None
 
     def __str__(self):
         spaces_1 = '{a}    |{b}    |{c}    \n'
@@ -24,6 +28,61 @@ class TicTacToe:
                                                    spaces_1.format(a=key + 1, b=key + 2, c=key + 3)
         return board_string_representation + spaces_1.format(a=' ', b=' ', c=' ')
 
+    def write(self, cmd=True, message=None):
+        """
+        :param cmd:
+            True if we should write in cmd, else False. This parameter
+            is for compatibility with start_game method.
+        :param message:
+            'board'     -   print board
+            'greeting'  -   to greet the players
+            'input'     -   prompt to enter a move
+            'winput'    -   wrong input
+            'c'         -   early exit
+            'stalemate' -   game ending with stalemate
+            '1'         -   first player won
+            '2'         -   second player won
+            'again'     -   invitation to try again
+            'bye'       -   if user rejected to try again
+        """
+        replies = {
+            'board': self,
+            'greeting': 'Welcome to my Tic-Tac-Toe game! '
+                        'If you want to end the game at any point - please, '
+                        'enter "c" symbol ("c" from close).',
+            'input': f'Move of {"1st" if self.turn % 2 else "2nd"} '
+                     f'player {"(X)" if self.turn % 2 else "(O)"}.'
+                     f' \nPlease, enter number of cell you want to capture (from 1 to 9):\n ',
+            'winput': 'Please, enter the valid number '
+                      '(integer from 1 to 9) of cell that is not captured: \n',
+            'c': '\n Early termination of game. Bye!\n',
+            'stalemate': '\nThis is a stalemate! :(\n',
+            '1': '\nThe 1st player won! Congratulations!\n',
+            '2': '\nThe 2nd player won! Congratulations!\n',
+            'again': 'Want to try again? Enter "1" if so. '
+                     'Any other input will be considered as rejection.\n',
+            'bye': 'Ok! See you later!\n'
+        }
+        if message in replies:
+            if cmd:
+                print(replies[message])
+                return None
+            return replies[message]
+        return None
+
+    def read(self):
+        """
+        This function reads next move
+        :return:
+        """
+        if self.steps is None:
+            return input().strip().lower()
+        if isinstance(self.steps, Iterable):
+            return next(self.steps)
+        temp = self.steps.copy()
+        self.steps = None
+        return temp
+
     def reset(self):
         """
         This method resets the board.
@@ -32,7 +91,7 @@ class TicTacToe:
         self.board = [' ' for _ in range(9)]
         self.turn = 1
 
-    def next_move(self, entry=None):
+    def next_move(self, entry):
         """
         This method implements the 'make your move'-functional.
         There is an opportunity to give "move" arg, which may contain single move,
@@ -45,32 +104,12 @@ class TicTacToe:
             2) Move is not None:    tuple(self.board)
         """
         if entry is None:
-            entry = input(
-                f'Move of {"1st" if self.turn % 2 else "2nd"} '
-                f'player {"(X)" if self.turn % 2 else "(O)"}.'
-                f' \nPlease, enter number of cell you want to capture (from 1 to 9):\n '
-            ).strip()
-            while True:
-                if entry == 'c':
-                    return -1
-                if entry.isdigit() and int(entry) in (1, 2, 3, 4, 5, 6, 7, 8, 9) \
-                        and self.board[int(entry) - 1] == ' ':
-                    self.board[int(entry) - 1] = 'X' if self.turn % 2 else 'O'
-                    break
-                entry = input('Please, enter the valid number '
-                              '(integer from 1 to 9) of cell that is not captured: \n').strip()
+            return -1
+        entry = entry.strip().lower()
+        if entry.isdigit() and int(entry) in (1, 2, 3, 4, 5, 6, 7, 8, 9) \
+                and self.board[int(entry) - 1] == ' ':
+            self.board[int(entry) - 1] = 'X' if self.turn % 2 else 'O'
             self.turn += 1
-            print(self)
-            return 0
-        entry = entry.strip()
-        if entry.isdigit() and int(entry) in (1, 2, 3, 4, 5, 6, 7, 8, 9):
-            # We want to ignore impossible move if it was not given via cmd-line
-            # so we don't want to ask for valid move.
-            # Also there is no need to print the board,
-            # but it may be useful to return current board as tuple.
-            if self.board[int(entry) - 1] == ' ':
-                self.board[int(entry) - 1] = 'X' if self.turn % 2 else 'O'
-                self.turn += 1
             return tuple(self.board)
         if entry == 'c':
             return -1
@@ -107,72 +146,46 @@ class TicTacToe:
             return False, 0
         return True, 0
 
-    def start_game(self, steps=None):
+    def start_game(self, cmd=True, steps=None):
         """
         This method implements the game mechanic in general.
         There is an opportunity to give "move" arg, which may contain single move
         as well as Iterable of moves. It is may be helpful in unit-testing.
         :return:
-            1) Steps is None:       None
-            2) Steps is not None:   list[
-                    tuple(   tuple(resulting 'self.board' after finishing the game), int(win)   )
-                ]
-                                        (win -> 1 if won 1st, -1 if won 2nd, 0 if stalemate)
+
         """
-        if steps is None:
+        self.steps = steps if not isinstance(steps, Iterable) else iter(steps)
+        self.write(cmd, 'greeting')
+        try:
             while True:
-                print('Welcome to my Tic-Tac-Toe game! '
-                      'If you want to end the game at any point - please, '
-                      'enter "c" symbol ("c" from close).')
-                print(self)
+                self.write(cmd, 'board')
+                self.write(cmd, 'input')
                 condition = self.finished()
                 while not condition[0]:
-                    if self.next_move() is not None:
-                        print('\n Early termination of game. Bye!\n')
-                        return -1
+                    step = self.read()
+                    res = self.next_move(step)
+                    if res == -2:
+                        self.write(cmd, 'winput')
+                        continue
+                    if res == -1:
+                        self.write(cmd, 'c')
+                        self.history.append(('C',))
+                        return tuple(self.history)
                     condition = self.finished()
-                if condition[1] == 0:
-                    print('\nThis is a stalemate! :(\n')
-                else:
-                    print(f'\nThe {"1st" if condition[1] > 0 else "2nd"} player won! '
-                          f'Congratulations!\n')
-                try_again = input('Want to try again? Enter "1" if so. '
-                                  'Any other input will be considered as rejection.\n')
+                    self.write(cmd, 'board')
+                    self.write(cmd, 'input')
+                self.history.append((tuple(self.board), condition[1]))
+                self.write(cmd,
+                           'stalemate' if condition[1] == 0 else ('1' if condition[1] > 0 else '2'))
+                self.write(cmd, 'again')
+                try_again = self.read().strip()
                 if try_again.isdigit() and int(try_again) == 1:
                     self.reset()
-                    print(self)
                 else:
-                    print('Ok! See you later!\n')
-                    break
-        else:
-            if not isinstance(steps, Iterable):
-                return self.next_move(steps)
-            answer = []
-            condition = self.finished()
-            for step in steps:
-                step = step.strip()
-                if step == 'c':
-                    break
-                # print(self.turn, '    asd    ', step)
-                if answer and self.turn == 1:
-                    # print(step)
-                    if not step.isdigit() or int(step) != 1:
-                        # print('here')
-                        return answer
-                if condition[0]:
-                    answer.append((tuple(self.board), condition[1]))
-                    self.reset()
-                    if not step.isdigit() or int(step) != 1:
-                        return answer
-                    condition = self.finished()
-                    continue
-                if self.next_move(step) == -1:
-                    answer.append(-1)
-                    return answer
-                condition = self.finished()
-            if condition[0]:
-                answer.append((tuple(self.board), condition[1]))
-            return answer
+                    self.write(cmd, 'bye')
+                    return tuple(self.history)
+        except StopIteration:
+            return tuple(self.history)
 
 
 if __name__ == "__main__":

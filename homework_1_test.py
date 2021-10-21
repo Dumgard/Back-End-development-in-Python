@@ -1,4 +1,5 @@
 import unittest
+from collections import Iterable
 from homework_1 import TicTacToe
 
 
@@ -6,6 +7,56 @@ class TestTicTacToe(unittest.TestCase):
     """
     Class for testing my TicTacToe game-class.
     """
+
+    def test_write(self):
+        game = TicTacToe()
+        messages = [
+            'board', 'greeting', 'input', 'winput', 'c',
+            'stalemate', '1', '2', 'again', 'bye',
+            'asd', 'something', '', 1, 3451, -12.51, None
+        ]
+        replies = [
+            game,
+            'Welcome to my Tic-Tac-Toe game! '
+            'If you want to end the game at any point - please, '
+            'enter "c" symbol ("c" from close).',
+            f'Move of {"1st" if game.turn % 2 else "2nd"} '
+            f'player {"(X)" if game.turn % 2 else "(O)"}.'
+            f' \nPlease, enter number of cell you want to capture (from 1 to 9):\n ',
+            'Please, enter the valid number '
+            '(integer from 1 to 9) of cell that is not captured: \n',
+            '\n Early termination of game. Bye!\n',
+            '\nThis is a stalemate! :(\n',
+            '\nThe 1st player won! Congratulations!\n',
+            '\nThe 2nd player won! Congratulations!\n',
+            'Want to try again? Enter "1" if so. '
+            'Any other input will be considered as rejection.\n',
+            'Ok! See you later!\n',
+            None, None, None, None, None, None, None
+        ]
+        for mes, rep in zip(messages, replies):
+            self.assertEqual(rep, game.write(cmd=False, message=mes))
+
+    def test_read(self):
+        game = TicTacToe()
+        inputs = [
+            ['8', '8', '3', '8', '3', '4', '8', '4', '8', '1', '8', '9', '2', '4', '3', '8'],
+            ['4', '2', '6', '2', '2', '2', '8', '4', '8', '9', '9', '8', '6', '8', '6', '6',
+             '7', '5', '8', '9', '9', '4', '2', '7', '2', '8'],
+            ['4', '2', '6', '2', ' 2', '2', ' c ', '8 ', '4 ', '8', '9'],
+            ['9', '8', '8', '1', '6', '7', '6', '5', '4 ', '1', '1', 'c', '2', '4', '3', '7'],
+            ['asc', '2 123 5', 'asd ga d', '1 1', 'asd 1 13 f', '7', 'ash', 'c', '113', '1',
+             '1', '2', '4', '3', '7'],
+            ['asc', '2 123 5', 'asd ga d', '1 1', 'asd 1 13 f', '7', 'ash', '113', '1', '1',
+             '8', '4', '9', 'c'],
+        ]
+        answers = inputs.copy()
+
+        for inp, ans in zip(inputs, answers):
+            game.steps = inp if not isinstance(inp, Iterable) else iter(inp)
+            for a in ans:
+                self.assertEqual(a, game.read())
+
     def test_reset(self):
         """
         Tests of TicTacToe.reset() method.
@@ -30,12 +81,12 @@ class TestTicTacToe(unittest.TestCase):
             '    7': ('X', 'O', ' ', ' ', ' ', 'X', 'O', ' ', ' '),
             'c ': -1,
             'hhgf': -2,
-            'C': -2,
+            'C': -1,
             'h': -2,
-            ' 1 ': ('X', 'O', ' ', ' ', ' ', 'X', 'O', ' ', ' '),
-            '  1 ': ('X', 'O', ' ', ' ', ' ', 'X', 'O', ' ', ' '),
-            ' 1   ': ('X', 'O', ' ', ' ', ' ', 'X', 'O', ' ', ' '),
-            ' 2 ': ('X', 'O', ' ', ' ', ' ', 'X', 'O', ' ', ' '),
+            ' 1 ': -2,
+            '  1 ': -2,
+            ' 1   ': -2,
+            ' 2 ': -2,
             ' 8 ': ('X', 'O', ' ', ' ', ' ', 'X', 'O', 'X', ' '),
             'asd ase 12 f a': -2,
         }
@@ -78,8 +129,9 @@ class TestTicTacToe(unittest.TestCase):
     def test_start_game(self):
         """
         Tests of TicTacToe.start_game() method.
-        -1  - code of early exit
-        -2  - code of wrong input
+         1  - won first player,
+        -1  - won second player,
+         0  - stalemate
         """
         list_steps = [
             list(map(str, [1, 1, 1, 2, 2, 3, 4, 5, 6, 7, 1, 1, 2, 3, 4, 5, 6, 7, 1, 1])),
@@ -94,7 +146,8 @@ class TestTicTacToe(unittest.TestCase):
             ['asc', '2 123 5', 'asd ga d', '1 1', 'asd 1 13 f', '7', 'ash', 'c', '113', '1',
              '1', '2', '4', '3', '7'],
             ['asc', '2 123 5', 'asd ga d', '1 1', 'asd 1 13 f', '7', 'ash', '113', '1', '1',
-             '8', '4', '9', 'c']
+             '8', '4', '9', 'c'],
+            list(map(str, [1, 2, 3, 5, 4, 7, 6, 9, 8]))
         ]
         answers = [
             [(('X', 'O', 'X', 'O', 'X', 'O', 'X', ' ', ' '), 1), (('X', 'O', 'X', 'O', 'X',
@@ -102,19 +155,22 @@ class TestTicTacToe(unittest.TestCase):
             [(('X', 'O', 'X', 'O', 'X', 'O', 'X', ' ', ' '), 1)],
             [(('O', 'O', 'O', 'X', ' ', ' ', ' ', 'X', 'X'), -1)],
             [((' ', 'O', ' ', 'X', 'X', 'X', 'O', 'O', 'X'), 1)],
-            [],
-            [(('X', ' ', ' ', 'X', 'O', 'O', 'X', 'O', 'X'), 1)],
+            [('C',)],
+            [(('X', ' ', ' ', 'X', 'O', 'O', 'X', 'O', 'X'), 1), ('C',)],
             [(('X', ' ', ' ', 'X', 'O', 'O', 'X', 'O', 'X'), 1), (('X', 'O', 'O', 'X', ' ',
                                                                    ' ', 'X', ' ', ' '), 1)],
             [(('O', ' ', 'X', ' ', 'O', 'X', ' ', ' ', 'X'), 1)],
-            [],
-            [(('O', ' ', ' ', 'O', ' ', ' ', 'X', 'X', 'X'), 1)]
+            [('C',)],
+            [(('O', ' ', ' ', 'O', ' ', ' ', 'X', 'X', 'X'), 1)],
+            [(('X', 'O', 'X', 'X', 'O', 'X', 'O', 'X', 'O'), 0)]
         ]
 
         game = TicTacToe()
-        for steps, ans in zip(list_steps, answers):
+        for steps, ans in zip(list_steps, list(map(tuple, answers))):
             game.reset()
-            self.assertEqual(ans, game.start_game(steps))
+            game.history = []
+            res = game.start_game(cmd=False, steps=steps)
+            self.assertEqual(ans, res)
 
 
 if __name__ == '__main__':
