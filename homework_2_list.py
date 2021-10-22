@@ -4,7 +4,7 @@
 
 class CustomList(list):
     def __init__(self, data=None):
-        super().__init__(data)
+        super().__init__([] if data is None else data)
         self.sum = sum(self)
 
     def __add__(self, other):
@@ -31,21 +31,21 @@ class CustomList(list):
         return CustomList([-i for i in self - other])
 
     def __le__(self, other):
-        return self.sum <= other.sum
+        return self.sum <= sum(other)
 
     def __ge__(self, other):
-        return self.sum >= other.sum
+        return self.sum >= sum(other)
 
     def __eq__(self, other):
-        return self.sum == other.sum
+        return self.sum == sum(other)
 
     def __lt__(self, other):
-        return self.sum < other.sum
+        return self.sum < sum(other)
 
     def __gt__(self, other):
-        return self.sum > other.sum
+        return self.sum > sum(other)
 
     def __ne__(self, other):
-        return self.sum != other.sum
+        return self.sum != sum(other)
 
     __radd__ = __add__

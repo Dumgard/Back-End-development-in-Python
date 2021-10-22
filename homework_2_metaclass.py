@@ -19,7 +19,7 @@ class CustomMeta(type):
     def __new__(cls, name, bases, dct):
         new_dct = {}
         for key, val in dct.items():
-            if key[:2] == '__' and key[-2:] == '__':
+            if key.startswith('__') and key.endswith('__'):
                 new_dct[key] = val
                 continue
             new_dct['custom_' + key] = val
