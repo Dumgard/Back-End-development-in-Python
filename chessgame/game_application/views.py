@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render
 from django.template import loader
 
@@ -17,7 +17,7 @@ def new_board(request):
                             ]
         })
     else:
-        return HttpResponseBadRequest
+        return HttpResponseNotAllowed
 
 
 def list_board(request):
@@ -66,7 +66,7 @@ def list_board(request):
             ]
         })
     else:
-        return HttpResponseBadRequest
+        return HttpResponseNotAllowed
 
 
 def info(request, game_id):
@@ -91,12 +91,12 @@ def info(request, game_id):
                     ],
         })
     else:
-        return HttpResponseBadRequest
+        return HttpResponseNotAllowed
 
 
 def render_board(request):
     if request.method == 'GET':
         return render(request, 'emptyBoard.html')
     else:
-        return HttpResponseBadRequest
+        return HttpResponseNotAllowed
 
