@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from game_application.views import new_board, list_board, info, render_board
+from games.views import new_board, list_board, info, render_board
 
 
 urlpatterns = [

@@ -40,8 +40,8 @@ class TicTacToe:
             'winput'    -   wrong input
             'c'         -   early exit
             'stalemate' -   game ending with stalemate
-            '1'         -   first player won
-            '2'         -   second player won
+            '1'         -   first players won
+            '2'         -   second players won
             'again'     -   invitation to try again
             'bye'       -   if user rejected to try again
         """
@@ -51,14 +51,14 @@ class TicTacToe:
                         'If you want to end the game at any point - please, '
                         'enter "c" symbol ("c" from close).',
             'input': f'Move of {"1st" if self.turn % 2 else "2nd"} '
-                     f'player {"(X)" if self.turn % 2 else "(O)"}.'
+                     f'players {"(X)" if self.turn % 2 else "(O)"}.'
                      f' \nPlease, enter number of cell you want to capture (from 1 to 9):\n ',
             'winput': 'Please, enter the valid number '
                       '(integer from 1 to 9) of cell that is not captured: \n',
             'c': '\n Early termination of game. Bye!\n',
             'stalemate': '\nThis is a stalemate! :(\n',
-            '1': '\nThe 1st player won! Congratulations!\n',
-            '2': '\nThe 2nd player won! Congratulations!\n',
+            '1': '\nThe 1st players won! Congratulations!\n',
+            '2': '\nThe 2nd players won! Congratulations!\n',
             'again': 'Want to try again? Enter "1" if so. '
                      'Any other input will be considered as rejection.\n',
             'bye': 'Ok! See you later!\n'
@@ -121,8 +121,8 @@ class TicTacToe:
         :return:
             If game is finished and:
                 1) It is a stalemate:   returns (true, 0)
-                2) 1st player won:      returns (true, 1)
-                3) 2nd player won:      returns (true, -1)
+                2) 1st players won:      returns (true, 1)
+                3) 2nd players won:      returns (true, -1)
             Else:
                                         returns (false, 0)
         """

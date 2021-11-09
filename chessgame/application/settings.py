@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'game_application',
+    'games',
+    'players',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,12 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+try:
+    from credentials import DATABASES_CURRENT
+    DATABASES = DATABASES_CURRENT
+except ImportError:
+    pass
 
 
 # Password validation

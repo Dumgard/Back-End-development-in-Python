@@ -19,6 +19,6 @@ from django.shortcuts import render
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('game/', include('game_application.urls')),
+    path('game/', include('games.urls')),
     path('', lambda request: render(request, 'homePage.html')),
 ]

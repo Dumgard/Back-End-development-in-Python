@@ -21,14 +21,14 @@ class TestTicTacToe(unittest.TestCase):
             'If you want to end the game at any point - please, '
             'enter "c" symbol ("c" from close).',
             f'Move of {"1st" if game.turn % 2 else "2nd"} '
-            f'player {"(X)" if game.turn % 2 else "(O)"}.'
+            f'players {"(X)" if game.turn % 2 else "(O)"}.'
             f' \nPlease, enter number of cell you want to capture (from 1 to 9):\n ',
             'Please, enter the valid number '
             '(integer from 1 to 9) of cell that is not captured: \n',
             '\n Early termination of game. Bye!\n',
             '\nThis is a stalemate! :(\n',
-            '\nThe 1st player won! Congratulations!\n',
-            '\nThe 2nd player won! Congratulations!\n',
+            '\nThe 1st players won! Congratulations!\n',
+            '\nThe 2nd players won! Congratulations!\n',
             'Want to try again? Enter "1" if so. '
             'Any other input will be considered as rejection.\n',
             'Ok! See you later!\n',
@@ -129,8 +129,8 @@ class TestTicTacToe(unittest.TestCase):
     def test_start_game(self):
         """
         Tests of TicTacToe.start_game() method.
-         1  - won first player,
-        -1  - won second player,
+         1  - won first players,
+        -1  - won second players,
          0  - stalemate
         """
         list_steps = [
